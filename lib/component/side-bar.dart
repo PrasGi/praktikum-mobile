@@ -1,3 +1,4 @@
+import 'package:expanse_tracker/services/auth-service.dart';
 import 'package:flutter/material.dart';
 
 class SideBar extends StatelessWidget {
@@ -5,6 +6,7 @@ class SideBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    AuthService authService = new AuthService();
     return Drawer(
       child: ListView(
         children: <Widget>[
@@ -22,7 +24,8 @@ class SideBar extends StatelessWidget {
                     color: Colors.red, // Warna teks merah
                   ),
                 ),
-                onPressed: () {
+                onPressed: () async {
+                  authService.logout();
                   Navigator.pushNamed(context, '/login');
                 },
               ),

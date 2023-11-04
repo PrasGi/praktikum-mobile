@@ -1,5 +1,6 @@
 import 'package:expanse_tracker/component/bottom-bar.dart';
 import 'package:expanse_tracker/component/side-bar.dart';
+import 'package:expanse_tracker/services/finance-service.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -13,6 +14,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
+    FinanceService.getFinance();
     return Scaffold(
         appBar: AppBar(
           title: Text('Home'),

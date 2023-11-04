@@ -1,3 +1,4 @@
+import 'package:expanse_tracker/services/auth-service.dart';
 import 'package:flutter/material.dart';
 
 class Register extends StatefulWidget {
@@ -15,6 +16,7 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
+    AuthService authService = new AuthService();
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -34,7 +36,7 @@ class _RegisterState extends State<Register> {
             // Field teks untuk password
             TextFormField(
               controller: _emailController,
-              obscureText: true, // Untuk menyembunyikan teks
+              obscureText: false, // Untuk menyembunyikan teks
               decoration: InputDecoration(
                 labelText: 'Email',
                 hintText: 'Enter your email',
@@ -53,33 +55,17 @@ class _RegisterState extends State<Register> {
             SizedBox(height: 20.0), // Spasi antar elemen
             // Tombol untuk melakukan login
             ElevatedButton(
-              onPressed: () {
-                // Implementasi logika autentikasi dapat ditambahkan di sini
-                // Misalnya, validasi username dan password
-                // Contoh:
-                if (_usernameController.text == 'user' &&
-                    _passwordController.text == 'password') {
-                  // Redirect ke halaman utama jika autentikasi berhasil
+              onPressed: () async {
+                bool auth = await authService.register(_usernameController.text,
+                    _emailController.text, _passwordController.text);
+
+                if (auth) {
                   Navigator.pushNamed(context, '/home');
                 } else {
-                  // Tampilkan pesan kesalahan jika autentikasi gagal
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Error'),
-                        content: Text('Invalid username or password.'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Register failed"),
+                    backgroundColor: Colors.redAccent,
+                  ));
                 }
               },
               child: Text('REGISTER'),

@@ -1,5 +1,6 @@
 import 'package:expanse_tracker/pages/home.dart';
 import 'package:expanse_tracker/pages/register.dart';
+import 'package:expanse_tracker/services/auth-service.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
@@ -9,11 +10,12 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   // Buat TextEditingController untuk mengambil input dari field teks
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    AuthService authService = new AuthService();
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -23,10 +25,10 @@ class _LoginState extends State<Login> {
             Text("LOGIN", style: TextStyle(fontSize: 30.0)),
             // Field teks untuk username
             TextFormField(
-              controller: _usernameController,
+              controller: _emailController,
               decoration: InputDecoration(
-                labelText: 'Username',
-                hintText: 'Enter your username',
+                labelText: 'email',
+                hintText: 'Enter your email',
               ),
             ),
             SizedBox(height: 20.0), // Spasi antar elemen
@@ -42,33 +44,18 @@ class _LoginState extends State<Login> {
             SizedBox(height: 20.0), // Spasi antar elemen
             // Tombol untuk melakukan login
             ElevatedButton(
-              onPressed: () {
-                // Implementasi logika autentikasi dapat ditambahkan di sini
-                // Misalnya, validasi username dan password
-                // Contoh:
-                if (_usernameController.text == 'user' &&
-                    _passwordController.text == 'password') {
-                  // Redirect ke halaman utama jika autentikasi berhasil
+              onPressed: () async {
+                // Panggil fungsi login dari AuthService
+                bool auth = await authService.login(
+                    _emailController.text, _passwordController.text);
+
+                if (auth) {
                   Navigator.pushNamed(context, '/home');
                 } else {
-                  // Tampilkan pesan kesalahan jika autentikasi gagal
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Error'),
-                        content: Text('Invalid username or password.'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("Login failed, email or password incorrect"),
+                    backgroundColor: Colors.redAccent,
+                  ));
                 }
               },
               child: Text('Login'),
