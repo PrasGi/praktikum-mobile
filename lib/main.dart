@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
         '/register': (context) => Register(),
         '/home': (context) => Home(),
         '/history': (context) => History(),
-        '/history/detail': (context) => HistoryDetail(),
       },
     );
   }

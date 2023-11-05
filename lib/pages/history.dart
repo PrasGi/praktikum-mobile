@@ -1,12 +1,48 @@
 import 'package:expanse_tracker/component/bottom-bar.dart';
+import 'package:expanse_tracker/pages/history-detail.dart';
+import 'package:expanse_tracker/services/finance-service.dart';
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 
-class History extends StatelessWidget {
-  final List<Map<String, String>> buttons = [
-    {'text': 'Need'},
-    {'text': 'Want'},
-    {'text': 'Saving'},
-  ];
+class History extends StatefulWidget {
+  @override
+  _HistoryState createState() => _HistoryState();
+}
+
+class _HistoryState extends State<History> {
+  List<Category> buttons = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategoryData();
+  }
+
+  Future<void> _fetchCategoryData() async {
+    // await FinanceService.getFinance(1);
+    try {
+      Response datas = await FinanceService.getCategory();
+      if (datas.statusCode == 200) {
+        List<dynamic> categoriesData = datas.data as List;
+        List<Category> categories = categoriesData.map((category) {
+          return Category(category['id'], category['name'].toString());
+        }).toList();
+        setState(() {
+          buttons = categories;
+        });
+      } else {
+        // Handle error or set default values
+        buttons = [
+          Category(1, 'Need'),
+        ];
+      }
+    } catch (error) {
+      // Handle network or other errors
+      buttons = [
+        Category(1, 'Need'),
+      ];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +73,7 @@ class History extends StatelessWidget {
 }
 
 class CustomButtons extends StatelessWidget {
-  final List<Map<String, String>> buttons;
+  final List<Category> buttons;
 
   CustomButtons({required this.buttons});
 
@@ -49,7 +85,15 @@ class CustomButtons extends StatelessWidget {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/history/detail');
+                // Navigasi ke halaman detail dengan membawa ID kategori
+                // Navigator.pushNamed(context, '/history/detail',
+                //     arguments: button.id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HistoryDetail(categoryId: button.id),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(
@@ -60,7 +104,7 @@ class CustomButtons extends StatelessWidget {
                 shadowColor: Colors.black,
               ),
               child: Text(
-                button['text']!,
+                button.name, // Menggunakan property 'name' dari objek Category
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -74,4 +118,11 @@ class CustomButtons extends StatelessWidget {
       }).toList(),
     );
   }
+}
+
+class Category {
+  final int id;
+  final String name;
+
+  Category(this.id, this.name);
 }
